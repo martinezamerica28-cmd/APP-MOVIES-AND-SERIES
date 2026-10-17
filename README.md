@@ -4,12 +4,16 @@ App de películas y series en React Native + Expo + TypeScript, basada en los bo
 
 ## Empezar desde un PC
 
-Requisitos: Node 24 LTS, npm y Expo Go compatible con Expo SDK 58 en el iPhone.
+Requisitos: Node 24.12.0 o superior de la rama LTS, npm y Expo Go compatible con Expo SDK 57 en el iPhone.
 
 ```sh
 npm ci
 npm start
 ```
+
+Este proyecto utiliza **Expo SDK 57**, compatible con Expo Go cliente 57.0.9 / SDK 57.0.0. `npm start` selecciona explícitamente Expo Go.
+
+Si descargaste antes la versión con SDK 58: detén Expo con Ctrl+C, descarga de nuevo el ZIP de GitHub, extráelo en una carpeta nueva y ejecuta `npm ci` y `npx expo start --go --clear` desde esa carpeta.
 
 Escanea el QR con la cámara del iPhone. PC y teléfono deben estar en la misma red. Si tu Expo Go no admite este SDK, utiliza un development build compatible; no cambies versiones aisladas de React Native. También puedes ejecutar `npm run web`.
 
