@@ -84,6 +84,7 @@ Para repetir la prueba de interfaz: instala Playwright, ejecuta `npx playwright 
 
 ## Archivos
 
+- `src/ProfileScreen.tsx`: perfil con foto, nombre, descripción, fecha, filas horizontales y listas que se abren por separado. Permite editar el perfil y elegir una foto; se reduce a 256 píxeles antes de guardarla.
 - `App.tsx`: pantallas y navegación modal del MVP; no depende de un servicio externo para arrancar.
 - `src/catalog.ts`: adaptador de TMDB y catálogo demo.
 - `src/storage.ts`: biblioteca local tipada.
@@ -92,3 +93,5 @@ Para repetir la prueba de interfaz: instala Playwright, ejecuta `npx playwright 
 - `eas.json`: perfiles development, preview y production.
 
 Siguiente refactor recomendado: separar las pantallas de `App.tsx` y migrar la navegación a Expo Router cuando se necesiten enlaces profundos y restauración de rutas.
+
+El perfil conserva Por ver, calificaciones y reseñas después de las secciones del boceto. No se crean listas de ejemplo. Los perfiles locales existentes conservan su colección y reciben una fecha de inicio local al abrir esta versión. La edición de datos se guarda junto con la biblioteca; la sincronización real con Firebase sigue pendiente de configurar y validar.
