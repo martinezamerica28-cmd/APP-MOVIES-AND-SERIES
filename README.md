@@ -21,15 +21,41 @@ Sin variables, funciona con un **catálogo ficticio claramente identificado** y 
 
 ## Catálogo real de TMDB
 
-1. Obtén un token de lectura de TMDB y revisa sus condiciones y atribución.
-2. Copia `.env.example` a `.env.local`. No publiques ese archivo.
-3. Inicia el servidor con `node --env-file=.env.local backend/server.mjs` (Node no carga `.env.local` automáticamente).
-4. Configura `EXPO_PUBLIC_CATALOG_URL` con la dirección de tu servidor **accesible desde el iPhone** y sin barra final. Para pruebas LAN usa la IP del PC y puerto 8787; para distribución usa un servidor HTTPS.
-5. Reinicia Expo. `TMDB_TOKEN` permanece en el servidor y nunca lleva prefijo `EXPO_PUBLIC_`.
+1. Crea una cuenta en https://www.themoviedb.org/signup y solicita acceso en Ajustes → API. Necesitas el **token de acceso de lectura de la API**, no una clave corta v3. Acepta las condiciones y revisa la atribución/licencia correspondiente a tu uso.
+2. En Windows, activa en el Explorador **Ver → Mostrar → Extensiones de nombre de archivo**. Copia `.env.example` con el nombre `.env.local` (sin `.txt`). Nunca publiques este archivo ni pegues el token en chats.
+3. Edita solo la línea `TMDB_TOKEN=` de `.env.local` para colocar tu token después del signo igual, sin la palabra Bearer. No uses `EXPO_PUBLIC_` para este token.
+4. Para revisar en tu PC ejecuta:
 
-El proxy permite únicamente cuatro endpoints, conserva la verificación HTTPS, limita la caché a 200 entradas y aplica timeout. Antes de publicar, añade autenticación y límites de tráfico en el alojamiento. `CORS_ORIGIN` restringe el origen web; CORS no sustituye autenticación.
+```sh
+npm ci
+npm run dev:web
+```
 
-Las películas usan `now_playing`. Las series en estreno son series cuya primera emisión ocurrió en los últimos 90 días, no todas las series que siguen emitiendo episodios. Terror en series se aproxima por Misterio, Romance por Drama y Fantasía/Ciencia ficción comparten la categoría de TMDB; esas equivalencias no son exactas. El catálogo carga la primera página de cada sección: la paginación es una mejora pendiente.
+El comando inicia el servidor, comprueba una consulta real a TMDB e inicia Expo web conectado al servidor. Si no hay token o TMDB lo rechaza, explica el problema y se detiene. Mantén la terminal abierta.
+
+Para el iPhone, detén ese proceso con Ctrl+C y ejecuta:
+
+```sh
+npm run dev:iphone
+```
+
+Elige la misma red Wi-Fi en ambos dispositivos y escanea el QR en Expo Go. Permite Node en redes privadas si el firewall de Windows lo solicita. El script usa la IP LAN del PC; si hay varias interfaces (VPN/VirtualBox/etc.), añade `CATALOG_LAN_HOST=192.168.1.50` a `.env.local`, sustituyendo el ejemplo por la IPv4 que muestra `ipconfig` para tu Wi-Fi. El modo túnel de Expo solo transporta Metro: no publica automáticamente este servidor de catálogo.
+
+Sin token puedes seguir usando `npm run web` / `npm start` con catálogo ficticio. Si configuraste manualmente `EXPO_PUBLIC_CATALOG_URL`, bórrala para volver al demo.
+
+### Servidor por separado y distribución
+
+`npm run backend` carga `.env.local` e inicia el proxy en el puerto 8787. `/health` indica si hay configuración, pero solo una consulta de catálogo valida el token. Para alojarlo en producción usa un servidor HTTPS, configura ahí `TMDB_TOKEN` y apunta `EXPO_PUBLIC_CATALOG_URL` a su dirección, sin barra final. Reinicia Expo después de cambiar variables públicas. El token se usa únicamente en el servidor; no se incorpora al código cliente.
+
+El proxy permite consultas de catálogo, búsqueda y detalles por ID, tiene timeout y una caché de cinco minutos con 200 entradas. Añade autenticación y límites de tráfico en tu alojamiento antes de ofrecerlo públicamente. `CORS_ORIGIN` restringe el origen web y no sustituye esos controles.
+
+Las películas usan `now_playing` con `region=MX`. Las series en estreno son series cuya primera emisión ocurrió en los últimos 90 días. Las búsquedas y pantallas por género permiten cargar páginas adicionales. Se excluyen personas y contenido marcado como adulto. Los errores de conexión, token faltante/rechazado y límite de solicitudes se muestran sin revelar credenciales. Las fichas cargan el detalle de TMDB al abrirlas.
+
+Terror en series se aproxima por Misterio, Romance por Drama y Fantasía/Ciencia ficción comparten una categoría de TMDB; esas equivalencias no son exactas. El catálogo requiere atribución y el logotipo oficial de TMDB según sus condiciones antes de publicar: el pie de página contiene el aviso textual; el logotipo aún está pendiente.
+
+Los identificadores de favoritos y reseñas separan demo/TMDB y películas/series. Los datos locales previos migran al leerlos, conservando listas y perfil; no se convierten los títulos ficticios en títulos reales.
+
+La integración se puede verificar con fixtures y sin credenciales, pero eso no demuestra conexión real a TMDB. La validación de una consulta real solo se completa al configurar un token válido.
 
 ## Firebase y cuentas privadas
 
@@ -78,7 +104,7 @@ npm test
 npx expo export --platform all
 ```
 
-Las pruebas del backend verifican rutas permitidas, ausencia de token, caché y errores del proveedor usando respuestas simuladas. No verifican la conectividad real a TMDB.
+Las pruebas del backend verifican rutas permitidas, ausencia/rechazo de token, caché, detalles, paginación, filtros y errores del proveedor usando respuestas simuladas. No verifican la conectividad real a TMDB.
 
 Para repetir la prueba de interfaz: instala Playwright, ejecuta `npx playwright install chromium`, exporta la web, sirve `dist` en el puerto 8765 y ejecuta `node scripts/smoke.cjs`. Cubre búsqueda, géneros, favoritos, reseñas, estados, listas y persistencia tras recargar.
 
@@ -95,3 +121,5 @@ Para repetir la prueba de interfaz: instala Playwright, ejecuta `npx playwright 
 Siguiente refactor recomendado: separar las pantallas de `App.tsx` y migrar la navegación a Expo Router cuando se necesiten enlaces profundos y restauración de rutas.
 
 El perfil conserva Por ver, calificaciones y reseñas después de las secciones del boceto. No se crean listas de ejemplo. Los perfiles locales existentes conservan su colección y reciben una fecha de inicio local al abrir esta versión. La edición de datos se guarda junto con la biblioteca; la sincronización real con Firebase sigue pendiente de configurar y validar.
+
+`node scripts/catalog-smoke.cjs` verifica el modo TMDB con respuestas interceptadas (sin token real), incluidos errores y reintentos, ficha completa, paginación y migración de favoritos demo/reales. Requiere exportar la web con `EXPO_PUBLIC_CATALOG_URL=http://127.0.0.1:8787`, servir esa exportación en el puerto 8766 y Chromium/Playwright instalado. No sustituye la consulta real que hace `npm run dev:web`.

@@ -32,8 +32,10 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "backend": "node backend/server.mjs",
-    "test": "node --test backend/server.test.mjs"
+    "backend": "node --env-file-if-exists=.env.local backend/server.mjs",
+    "test": "node --test backend/server.test.mjs",
+    "dev:web": "node --env-file-if-exists=.env.local scripts/dev-catalog.mjs --web",
+    "dev:iphone": "node --env-file-if-exists=.env.local scripts/dev-catalog.mjs"
   },
   "private": true,
   "engines": {
