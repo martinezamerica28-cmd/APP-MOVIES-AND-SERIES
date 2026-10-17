@@ -32,6 +32,14 @@ const { chromium } = require('playwright');
  await page.getByRole('textbox', { name: 'Buscar películas y series' }).fill('Órbita');
  await page.getByRole('button', { name: 'Buscar', exact: true }).click();
  await page.getByRole('button', { name: 'Ver Órbita', exact: true }).waitFor();
+ await page.getByRole('tab', { name: 'Favoritos', exact: true }).click();
+ await page.getByRole('button', { name: 'Ver Más allá de Orión', exact: true }).waitFor();
+ await page.getByRole('tab', { name: 'Explorar', exact: true }).click();
+ await page.getByText('Explora a tu ritmo', { exact: true }).waitFor();
+ await page.getByRole('tab', { name: 'Yo', exact: true }).click();
+ await page.getByText('Mis listas', { exact: true }).waitFor();
+ await page.getByRole('tab', { name: 'Inicio', exact: true }).click();
+ await page.getByRole('button', { name: 'Explorar géneros', exact: true }).waitFor();
  if (failures.length) throw Error(failures.join('\n'));
  await page.waitForTimeout(800); // Deja terminar las animaciones de cierre de los modales.
  await page.screenshot({ path: '/tmp/cineclub-smoke.png' });

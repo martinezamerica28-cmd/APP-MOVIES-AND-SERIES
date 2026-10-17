@@ -1,6 +1,6 @@
 # Cineclub
 
-App de películas y series en React Native + Expo + TypeScript, basada en los bocetos del proyecto. Diseño oscuro con acentos dorados, filas horizontales, menú lateral y perfil privado.
+App de películas y series en React Native + Expo + TypeScript, basada en los bocetos del proyecto. Diseño claro inspirado en superficies de relieve suave: tonos lavanda, botones fucsia, tarjetas redondeadas y navegación inferior con Inicio, Explorar, Favoritos y Yo. Conserva filas horizontales, menú lateral y perfil privado.
 
 ## Empezar desde un PC
 
